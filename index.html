@@ -24,16 +24,104 @@
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        iframe {
-            border: 1px solid #ddd;
+        #server-status {
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-online {
+            background-color: #4CAF50;
+        }
+        .status-offline {
+            background-color: #f44336;
+        }
+        .server-info {
+            margin: 10px 0;
+        }
+        .players {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #e8f5e9;
             border-radius: 4px;
+        }
+        .error {
+            color: #f44336;
+            font-weight: bold;
+        }
+        .loading {
+            color: #2196F3;
+            font-style: italic;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Minecraft服务器状态查询</h1>
-        <iframe id="mc-status-s11-minekuai-com-10025" frameborder="0" width="700" style="max-width:100%;" scrolling="no" src="https://motd.minebbs.com/iframe?ip=s11.minekuai.com&port=10025&stype=auto&dark=false"></iframe>
+        <div id="server-status">
+            <div class="loading">正在查询服务器状态...</div>
+        </div>
     </div>
+
+    <script>
+        // Minecraft服务器状态API查询
+        const serverIp = 's11.minekuai.com';
+        const serverPort = '10025';
+        const apiUrl = `https://motd.minebbs.com/api/status?ip=${serverIp}&port=${serverPort}&stype=auto`;
+
+        // 查询服务器状态
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => displayServerStatus(data))
+            .catch(error => {
+                console.error('Error fetching server status:', error);
+                document.getElementById('server-status').innerHTML = 
+                    '<div class="error">查询服务器状态失败，请稍后重试</div>';
+            });
+
+        // 显示服务器状态
+        function displayServerStatus(data) {
+            const statusDiv = document.getElementById('server-status');
+            
+            if (data.status === 'online') {
+                const playersOnline = data.players.online;
+                const playersMax = data.players.max;
+                const serverMOTD = data.pureMotd;
+                const serverVersion = data.version;
+                
+                statusDiv.innerHTML = `
+                    <div class="server-info">
+                        <h2>
+                            <span class="status-indicator status-online"></span>
+                            ${serverIp}:${serverPort}
+                        </h2>
+                        <p><strong>状态:</strong> 在线</p>
+                        <p><strong>MOTD:</strong> ${serverMOTD}</p>
+                        <p><strong>版本:</strong> ${serverVersion}</p>
+                        <div class="players">
+                            <p><strong>玩家:</strong> ${playersOnline}/${playersMax} 在线</p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                statusDiv.innerHTML = `
+                    <div class="server-info">
+                        <h2>
+                            <span class="status-indicator status-offline"></span>
+                            ${serverIp}:${serverPort}
+                        </h2>
+                        <p><strong>状态:</strong> 离线</p>
+                    </div>
+                `;
+            }
+        }
+    </script>
 </body>
 </html>
