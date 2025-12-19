@@ -89,8 +89,7 @@ const CONFIG = {
 ```
 MCServerMotd/
 ├── index.html          # 主页面文件
-├── README.md          # 项目说明文档
-└── check_html.py      # HTML结构检查脚本（可选）
+└── README.md          # 项目说明文档
 ```
 
 ## 使用说明
