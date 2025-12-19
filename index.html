@@ -168,7 +168,7 @@
         // Minecraft服务器列表配置
         const servers = [
             { ip: 's6.ungc.com.cn', port: '15120', name: '童话镇' },
-            { ip: 'mc.fnzjaq.me', port: '25565', name: '你也来🐱🐟么' } // 默认Minecraft端口是25565
+            { ip: 'mc.fnzjaq.me', port: '25565', name: '你也来🐱🐟么' }
         ];
 
         // 初始化状态显示
@@ -176,22 +176,119 @@
 
         // 查询所有服务器状态
         Promise.all(servers.map(server => {
-            const apiUrl = `https://motd.minebbs.com/api/status?ip=${server.ip}&port=${server.port}&stype=auto`;
+            const apiUrl = `https://motd.minebbs.com/api/status?ip=${server.ip}&port=${server.port}&stype=auto&string=${encodeURIComponent('服务器状态')}`;
             return fetch(apiUrl)
                 .then(response => response.json())
                 .then(data => ({ ...data, server }))
                 .catch(error => {
-                    console.error(`Error fetching status for ${server.ip}:${server.port}:`, error);
-                    return { status: 'error', server };
+                    return { status: 'error', server, error: '无法连接到服务器' };
                 });
         })).then(results => {
             displayServerStatus(results);
         }).catch(error => {
-            console.error('Error fetching server statuses:', error);
             document.getElementById('server-status').innerHTML = 
                 '<div class="error">查询服务器状态失败，请稍后重试</div>';
         });
 
+        // 转换Minecraft颜色代码为HTML
+        function convertMinecraftColors(motd) {
+            if (!motd) return '';
+            
+            // 处理嵌套的JSON结构（有些API返回的description是对象）
+            let motdText = '';
+            if (typeof motd === 'object' && motd !== null) {
+                if (motd.text) {
+                    motdText = motd.text;
+                } else if (motd.extra && Array.isArray(motd.extra)) {
+                    // 处理带有extra字段的复杂JSON结构
+                    motdText = motd.extra.map(part => {
+                        if (typeof part === 'object' && part.text) {
+                            return part.text;
+                        }
+                        return String(part);
+                    }).join('');
+                } else {
+                    motdText = JSON.stringify(motd);
+                }
+            } else {
+                // 简单字符串
+                motdText = String(motd);
+            }
+            
+            // Minecraft颜色代码映射
+            const colorMap = {
+                '0': '#000000', // 黑色
+                '1': '#0000AA', // 深蓝色
+                '2': '#00AA00', // 深绿色
+                '3': '#00AAAA', // 深青色
+                '4': '#AA0000', // 深红色
+                '5': '#AA00AA', // 紫色
+                '6': '#FFAA00', // 金色
+                '7': '#AAAAAA', // 灰色
+                '8': '#555555', // 深灰色
+                '9': '#5555FF', // 蓝色
+                'a': '#55FF55', // 绿色
+                'b': '#55FFFF', // 青色
+                'c': '#FF5555', // 红色
+                'd': '#FF55FF', // 粉色
+                'e': '#FFFF55', // 黄色
+                'f': '#FFFFFF'  // 白色
+            };
+            
+            // 格式代码映射
+            const formatMap = {
+                'l': 'font-weight: bold;',    // 粗体
+                'm': 'text-decoration: line-through;', // 删除线
+                'n': 'text-decoration: underline;', // 下划线
+                'o': 'font-style: italic;'    // 斜体
+            };
+            
+            let result = '';
+            let currentColor = '';
+            let currentFormat = '';
+            
+            for (let i = 0; i < motdText.length; i++) {
+                if (motdText[i] === '§' && i + 1 < motdText.length) {
+                    const code = motdText[i + 1];
+                    
+                    if (code === 'r') {
+                        // 重置所有格式
+                        if (currentColor || currentFormat) {
+                            result += '</span>';
+                            currentColor = '';
+                            currentFormat = '';
+                        }
+                    } else if (colorMap[code]) {
+                        // 颜色代码
+                        if (currentColor || currentFormat) {
+                            result += '</span>';
+                        }
+                        currentColor = colorMap[code];
+                        currentFormat = '';
+                        result += `<span style="color: ${currentColor};${currentFormat}">`;
+                    } else if (formatMap[code]) {
+                        // 格式代码
+                        if (currentColor || currentFormat) {
+                            result += '</span>';
+                        }
+                        currentFormat += formatMap[code];
+                        result += `<span style="color: ${currentColor || '#FFFFFF'};${currentFormat}">`;
+                    }
+                    
+                    i++; // 跳过下一个字符
+                } else {
+                    result += motdText[i];
+                }
+            }
+            
+            // 关闭最后一个span标签
+            if (currentColor || currentFormat) {
+                result += '</span>';
+            }
+            
+            return result;
+        }
+        
         // 显示服务器状态
         function displayServerStatus(results) {
             const statusDiv = document.getElementById('server-status');
@@ -204,7 +301,20 @@
                 if (data.status === 'online') {
                     const playersOnline = data.players.online;
                     const playersMax = data.players.max;
-                    const serverMOTD = data.pureMotd;
+                    
+                    // 查找可能包含颜色的MOTD字段
+                    let rawMotd = '';
+                    // 尝试各种常见的MOTD字段名
+                    const motdFields = ['description', 'motd', 'rawMotd', 'pureMotd', 'htmlMotd'];
+                    
+                    for (const field of motdFields) {
+                        if (data.hasOwnProperty(field)) {
+                            rawMotd = data[field];
+                            break;
+                        }
+                    }
+                    
+                    const serverMOTD = convertMinecraftColors(rawMotd);
                     const serverVersion = data.version;
                     
                     html += `
@@ -215,8 +325,8 @@
                             </h2>
                             <p class="server-address"><strong>地址:</strong> ${ip === 'mc.fnzjaq.me' ? ip : `${ip}:${port}`}</p>
                             <p><strong>状态:</strong> 在线</p>
-                            <p><strong>MOTD:</strong> ${serverMOTD}</p>
-                            <p><strong>版本:</strong> ${serverVersion}</p>
+                            <p><strong>MOTD:</strong> ${serverMOTD || '无'}</p>
+                            <p><strong>版本:</strong> ${serverVersion || '未知'}</p>
                             <div class="players">
                                 <p><strong>玩家:</strong> ${playersOnline}/${playersMax} 在线</p>
                             </div>
@@ -231,6 +341,7 @@
                             </h2>
                             <p class="server-address"><strong>地址:</strong> ${ip === 'mc.fnzjaq.me' ? ip : `${ip}:${port}`}</p>
                             <p><strong>状态:</strong> ${data.status === 'error' ? '查询失败' : '离线'}</p>
+                            ${data.error ? `<p class="error"><strong>错误:</strong> ${data.error}</p>` : ''}
                         </div>
                     `;
                 }
