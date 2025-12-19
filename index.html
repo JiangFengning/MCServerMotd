@@ -714,16 +714,24 @@
         function displayServerStatus(results) {
             let html = '';
             
-            results.forEach(data => {
+            // 按在线状态分组服务器
+            const onlineServers = results.filter(data => data.status === 'online');
+            const offlineServers = results.filter(data => data.status !== 'online');
+            
+            // 先显示在线服务器
+            onlineServers.forEach(data => {
                 const { server } = data;
                 const { ip, port } = server;
                 const addressDisplay = getServerAddressDisplay(ip, port);
-                
-                if (data.status === 'online') {
-                    html += generateOnlineServerHTML(data, addressDisplay);
-                } else {
-                    html += generateOfflineServerHTML(data, addressDisplay);
-                }
+                html += generateOnlineServerHTML(data, addressDisplay);
+            });
+            
+            // 再显示离线服务器
+            offlineServers.forEach(data => {
+                const { server } = data;
+                const { ip, port } = server;
+                const addressDisplay = getServerAddressDisplay(ip, port);
+                html += generateOfflineServerHTML(data, addressDisplay);
             });
             
             serverStatusSection.innerHTML = html;
