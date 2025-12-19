@@ -40,11 +40,12 @@
             --toggle-text-color: #ffffff;
         }
         
-        /* 基础样式 */
+        /* 基础样式重置 */
         * {
             box-sizing: border-box;
         }
         
+        /* 全局样式 */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -55,6 +56,7 @@
             transition: background-color 0.3s ease, color 0.3s ease;
         }
         
+        /* 标题样式 */
         h1, h2 {
             margin-bottom: 20px;
         }
@@ -63,6 +65,7 @@
             color: var(--text-color);
         }
         
+        /* 主容器样式 */
         .container {
             max-width: 800px;
             margin: 0 auto;
@@ -73,63 +76,26 @@
             transition: background-color 0.3s ease, box-shadow 0.3s ease;
         }
         
+        /* 服务器状态容器样式 */
         #server-status {
             margin: 20px 0;
             padding: 20px;
             border-radius: 8px;
             background-color: var(--status-bg);
             transition: background-color 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
         }
         
-        .status-indicator {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            margin-right: 8px;
-        }
-        
-        .status-online {
-            background-color: var(--online-color);
-        }
-        
-        .status-offline {
-            background-color: var(--offline-color);
-        }
-        
-        .server-info {
-            margin: 10px 0;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 15px;
-            margin-bottom: 15px;
-            transition: border-color 0.3s ease;
-        }
-        
-        .server-info:last-child {
-            border-bottom: none;
-        }
-        
-        .server-address {
-            color: var(--address-color);
-            font-style: italic;
-            margin: 5px 0;
-            transition: color 0.3s ease;
-        }
-        
-        .players {
-            margin-top: 15px;
-            padding: 10px;
-            background-color: var(--players-bg);
-            border-radius: 4px;
-            transition: background-color 0.3s ease;
-        }
-        
+        /* 错误信息样式 */
         .error {
             color: var(--error-color);
             font-weight: bold;
             transition: color 0.3s ease;
         }
         
+        /* 加载状态样式 */
         .loading {
             color: var(--loading-color);
             font-style: italic;
@@ -184,14 +150,216 @@
                 font-size: 24px;
             }
             
-            h2 {
-                font-size: 20px;
+            .online-content-wrapper {
+                padding: 15px;
             }
             
-            .server-info {
-                padding-bottom: 10px;
-                margin-bottom: 10px;
+            .icon-container {
+                margin-right: 12px;
             }
+            
+            .server-icon {
+                width: 48px;
+                height: 48px;
+            }
+            
+            .motd-display {
+                font-size: 14px;
+            }
+            
+            .info-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            
+            .info-label {
+                font-size: 11px;
+            }
+            
+            .info-value {
+                font-size: 13px;
+            }
+            
+            .player-count {
+                font-size: 13px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .online-content-wrapper {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            
+            .icon-container {
+                margin-right: 0;
+                margin-bottom: 12px;
+            }
+            
+            .card-header {
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* 卡片式设计 */
+        .card {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .status-card {
+            background-color: var(--container-bg);
+            border-radius: 12px;
+            box-shadow: var(--container-shadow);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .is-clickable {
+            cursor: pointer;
+        }
+        
+        .online-content-wrapper {
+            display: flex;
+            padding: 20px;
+            align-items: flex-start;
+        }
+        
+        .icon-container {
+            margin-right: 16px;
+            flex-shrink: 0;
+        }
+        
+        .server-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+        
+        .main-content {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .motd-display {
+            font-size: 16px;
+            font-weight: bold;
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+        
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            line-height: 1;
+            min-height: 24px;
+            min-width: 60px;
+            white-space: nowrap;
+            color: white;
+        }
+        
+        .status-indicator.Java {
+            background-color: #1D9BF0;
+        }
+        
+        /* 为不同状态的指示器设置合适的背景色和文本颜色 */
+        .status-indicator.online {
+            background-color: var(--online-color);
+        }
+        
+        .status-indicator.offline, .status-indicator.error {
+            background-color: var(--offline-color);
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .info-label {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .info-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-color);
+            transition: color 0.3s ease;
+        }
+        
+        .info-value.version {
+            color: #4CAF50;
+        }
+        
+        .players-sample {
+            font-style: italic;
+            color: #888;
+        }
+        
+        .players-info {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .player-count {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            transition: background-color 0.3s ease;
+        }
+        
+        .progress-bar-inner {
+            height: 100%;
+            background-color: var(--online-color);
+            transition: width 0.3s ease;
+        }
+        
+        /* 深色模式下的额外样式 */
+        body.dark-mode .progress-bar {
+            background-color: #444;
         }
         
         /* 加载动画 */
@@ -216,21 +384,30 @@
     </main>
 
     <script>
-        // 配置和常量
-        const config = {
-            servers: [
+        // 应用配置和常量
+        const CONFIG = {
+            // 服务器列表配置
+            SERVERS: [
                 { ip: 's6.ungc.com.cn', port: '15120', name: '童话镇' },
-                { ip: 'mc.fnzjaq.me', port: '25565', name: '你也来🐱🐟么' }
+                { ip: 'mc.fnzjaq.me', port: '25565', name: '你也来🐱🐟么' },
+                { ip: 'okkmc.cn', port: '32230', name: 'OKKMC' }
             ],
-            apiBase: 'https://motd.minebbs.com/api/status',
-            cacheDuration: 60 * 1000, // 1分钟缓存
-            autoRefreshInterval: 30 * 1000, // 30秒自动刷新
-            maxRetries: 3 // 最大重试次数
+            // API基础URL
+            API_BASE: 'https://motd.minebbs.com/api/status',
+            // 缓存持续时间 (毫秒)
+            CACHE_DURATION: 60 * 1000, // 1分钟缓存
+            // 自动刷新间隔 (毫秒)
+            AUTO_REFRESH_INTERVAL: 30 * 1000, // 30秒自动刷新
+            // API请求最大重试次数
+            MAX_RETRIES: 3 // 最大重试次数
         };
 
-        // DOM元素
+        // DOM元素引用
         const themeToggle = document.getElementById('theme-toggle');
         const serverStatusSection = document.getElementById('server-status');
+        
+        // 默认服务器图标 (Base64编码)
+        const DEFAULT_SERVER_ICON = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAEsElEQVR4Xu2avU+TURSHS41QIjBonEAWSEp0MZBA/Qt0gkI/EhdHiZ1bYGtYgbDJQHR1cjFhNnEAJif+oMo97e/2x+G8H7TUQHvf5Bnec7/e8/Te+35AJnP7aA05iYduMGxEHlJhWI/z83MBearc5RhZAWbizWbTs7a2dicKhYKg43Gsrq4KOt4PSNqBXCqVisAiggAWYCW9sbFhsr6+LhSLRUGXIx5XpuN3QfeB68E5/4hIvFqtCkFAEBAhAEmjM8fu7q6Ajnd2doSDgwNhb29PODw8FFCOdnGgrY6jDwvdFuMirkU5sBck7gFBgCEARCWOc1wAzo+Ojjy4yChQD211uVVXS0O5JQLHQAX8+FoSogSgXCf0IAVwYySKgfVURBwJctJ80XECdOJanlVXzzi9JCwBqTfBIIAao0MMGCXgZP+D8PfXRw/quAuDANRzWOU455gbDzGdOPfBWAJ6WgIjLwAJR01JYAnARTosAWgbtUQQc+VauD5HG1yvJaCnJZBWQLO2IrAATtaKWVjtrYT1+b0IwFsZN0bHGFCDKTdIAW58PeUBrk9vhpaAxCXQj4DK5pqAaevgZKwYpLE4jvGy+C8CrCWgB4qagoMWoEm6LktA4hIIAjoCrEdgDOSmWbO2fAtMwcpmwcMydKJRyXIMcILlhace/gHSCEi9BIKAURcQtwfwbsy3LyTAAjgJ1OMYy0B5a/ZNl7k2jaWMp7Q46fk281JIuwcEAf0IQOJukOp1chokxdO+Uix4LAEMpLU+feky+1rYWsx5zl7MeyxBWLK8jIOAfgSgw8ciIG4JpH4OSBIwfzoraAkOa1/g3Z3XcGMp60FS9XzG0zr53oaldJJmuJ+BCeBN8LEKKJfLQhBwFwHWJrj8+63Aa3j+dE7QaxtACt/mWIZOylG/XtMOjll7QGlyxoMfjP8yFQSkFYDvAdwYAjDtHSvXyTsgwpH5nBV+vst4+KEISZ89f+XZWhj3WFPcL4vrqQ3Ons97vIDctAcCeloCQYDxReixCYjbBBMfhOIEZIqZLttPhKvalKf1Z1e4qj3zsAwk7Xd2TeehxxLAuzzvK6XxKcHtS7hLBQH9CIi7C2S3sx6I4ARbxxNtOiKE45ynns8KN972GJU008iPefjZAncWd3cKAkZZAK7RARGWgMS7QJwAfHBwnUMAX1i9A+8LV7VpT+t4UtiamPHoRDWNpTGBH7V5D8DHFJYyMAHo2El4yAIGtgRGXgCesPCnJ7wbIA4aeSemDaS0xXRlgNJEl3KuDX/csN4wsRT1n8v1UrUE9PQ9YCQF8LuAHhCJW0uDQRxlvFyAbsttNBB8sv/ew4mjHs57ehsMAowlgIFxkTjHQBCik0EcZTp5FqD7sMB4LMD9ILocX4KtJdDTJnhfAjjRqLhO2hKAupiRuvxeBPA3dXSCAZAgzvVmBEGIWxuVrhsV5zI9rk5c/2BBQC8CLi4uBP5Xc+7IAhuNFpYG3dZCt9HwZudAnA/kkrgJBgGjKuDy8lJARTwxOfC/9o/t4B8RuQQBhgAcEsAuyQIQQ2PdGdflOKP7wLkeT9fj/qPqpgFtrMRxjLwAHFxpGEk8dINh48bxD72QHUXzXPQqAAAAAElFTkSuQmCC';
 
         // 缓存管理
         const cache = {
@@ -239,7 +416,7 @@
             get(key) {
                 const item = this.data[key];
                 if (!item) return null;
-                if (Date.now() - item.timestamp > config.cacheDuration) {
+                if (Date.now() - item.timestamp > CONFIG.CACHE_DURATION) {
                     delete this.data[key];
                     return null;
                 }
@@ -248,6 +425,16 @@
             
             set(key, value) {
                 this.data[key] = { value, timestamp: Date.now() };
+            },
+            
+            // 清除过期缓存
+            clearExpired() {
+                const now = Date.now();
+                Object.keys(this.data).forEach(key => {
+                    if (now - this.data[key].timestamp > CONFIG.CACHE_DURATION) {
+                        delete this.data[key];
+                    }
+                });
             }
         };
 
@@ -279,12 +466,9 @@
                     motdText = motd.text;
                 } else if (motd.extra && Array.isArray(motd.extra)) {
                     // 处理带有extra字段的复杂JSON结构
-                    motdText = motd.extra.map(part => {
-                        if (typeof part === 'object' && part.text) {
-                            return part.text;
-                        }
-                        return String(part);
-                    }).join('');
+                    motdText = motd.extra.map(part => 
+                        typeof part === 'object' && part.text ? part.text : String(part)
+                    ).join('');
                 } else {
                     motdText = JSON.stringify(motd);
                 }
@@ -311,24 +495,73 @@
             // 浅色文本列表（在白色背景上需要深色阴影）
             const lightColors = ['7', 'e', 'f'];
             
-            // 使用正则表达式优化颜色代码处理
+            // 处理颜色代码
             return motdText.replace(/§([0-9a-frlmno])/g, (match, code) => {
                 if (code === 'r') return '</span>';
                 if (colorMap[code]) {
-                    // 为浅色文本添加深色阴影以提高可读性
-                    if (lightColors.includes(code)) {
-                        return `<span style="color: ${colorMap[code]}; text-shadow: 0 0 2px #000000, 0 0 2px #000000;">`;
-                    }
-                    return `<span style="color: ${colorMap[code]};">`;
+                    const style = lightColors.includes(code) 
+                        ? `color: ${colorMap[code]}; text-shadow: 0 0 2px #000000, 0 0 2px #000000;`
+                        : `color: ${colorMap[code]};`;
+                    return `<span style="${style}">`;
                 }
-                if (formatMap[code]) return `<span style="${formatMap[code]}">`;
-                return match;
+                return formatMap[code] ? `<span style="${formatMap[code]}">` : match;
             });
         }
 
         // 获取服务器地址显示文本
         function getServerAddressDisplay(ip, port) {
             return port === '25565' ? ip : `${ip}:${port}`;
+        }
+
+        // 格式化玩家列表显示
+        function getPlayerListDisplay(players) {
+            if (!players || players.online === 0) {
+                return '无';
+            }
+
+            const playerList = players.sample;
+            
+            if (!playerList || typeof playerList !== 'string') {
+                return `有 ${players.online} 名玩家在线，但未返回具体列表`;
+            }
+
+            // 处理字符串格式的玩家列表
+            const playerNames = playerList.split(',').map(name => name.trim()).filter(Boolean);
+            if (playerNames.length === 0) {
+                return `有 ${players.online} 名玩家在线，但未返回具体列表`;
+            }
+            
+            // 统计匿名玩家数量并过滤
+            const anonymousCount = playerNames.filter(name => name === 'Anonymous Player').length;
+            const namedPlayers = playerNames.filter(name => name !== 'Anonymous Player');
+            
+            let result = namedPlayers.join(', ');
+            
+            // 如果有匿名玩家，添加到结果末尾
+            if (anonymousCount > 0) {
+                result = namedPlayers.length > 0 
+                    ? `${result},等 ${anonymousCount} 名玩家`
+                    : `有 ${anonymousCount} 名匿名玩家在线`;
+            }
+            
+            return result;
+        }
+
+        // 提取MOTD内容
+        // 尝试从多个可能的字段中提取MOTD信息，优先顺序为：description > motd > rawMotd > pureMotd > htmlMotd
+        // 如果所有字段都不存在，则返回服务器名称
+        function extractMOTD(data, serverName) {
+            // 按优先级顺序检查可能包含MOTD的字段
+            const motdFields = ['description', 'motd', 'rawMotd', 'pureMotd', 'htmlMotd'];
+            
+            for (const field of motdFields) {
+                if (data.hasOwnProperty(field)) {
+                    return convertMinecraftColors(data[field]);
+                }
+            }
+            
+            // 如果没有找到MOTD信息，返回服务器名称
+            return serverName;
         }
 
         // 查询单个服务器状态（带重试机制）
@@ -348,18 +581,20 @@
                     string: encodeURIComponent('服务器状态')
                 });
                 
-                const response = await fetch(`${config.apiBase}?${params}`);
+                const response = await fetch(`${CONFIG.API_BASE}?${params}`);
+                
                 if (!response.ok) {
-                    throw new Error('网络响应错误');
+                    throw new Error(`HTTP错误: ${response.status}`);
                 }
                 
                 const data = await response.json();
                 cache.set(cacheKey, data);
                 return { ...data, server };
             } catch (error) {
-                if (retryCount < config.maxRetries) {
-                    // 重试请求
-                    await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
+                if (retryCount < CONFIG.MAX_RETRIES) {
+                    // 指数退避重试
+                    const delay = Math.pow(2, retryCount) * 1000;
+                    await new Promise(resolve => setTimeout(resolve, delay));
                     return fetchServerStatus(server, retryCount + 1);
                 }
                 return { status: 'error', server, error: '无法连接到服务器' };
@@ -369,13 +604,112 @@
         // 查询所有服务器状态
         async function fetchAllServersStatus() {
             try {
-                const results = await Promise.all(config.servers.map(fetchServerStatus));
+                // 清除过期缓存
+                cache.clearExpired();
+                
+                const results = await Promise.all(CONFIG.SERVERS.map(fetchServerStatus));
                 displayServerStatus(results);
             } catch (error) {
                 serverStatusSection.innerHTML = '<div class="error">查询服务器状态失败，请稍后重试</div>';
             }
         }
 
+        // 生成在线服务器HTML
+        function generateOnlineServerHTML(data, addressDisplay) {
+            const { server, players, version, protocol, delay, ping } = data;
+            
+            // 提取并转换MOTD
+            const serverMOTD = extractMOTD(data, server.name);
+            
+            // 计算玩家进度条百分比
+            const progressPercentage = players.max > 0 ? Math.min((players.online / players.max) * 100, 100) : 0;
+            
+            // 获取玩家列表显示
+            const playersDisplay = getPlayerListDisplay(players);
+            
+            return `
+                <div class="card status-card is-clickable">
+                    <div class="online-content-wrapper">
+                        <div class="icon-container">
+                            <img src="${server.icon || DEFAULT_SERVER_ICON}" alt="Server Icon" class="server-icon">
+                        </div>
+                        <div class="main-content">
+                            <div class="card-header">
+                                <div class="motd-display">${serverMOTD || server.name}</div>
+                                <div class="status-indicator Java">
+                                    Java
+                                </div>
+                            </div>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <span class="info-label">地址</span>
+                                    <span class="info-value">${addressDisplay}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">版本</span>
+                                    <span class="info-value version">${version || '未知'}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">协议</span>
+                                    <span class="info-value">${protocol || '未知'}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">延迟</span>
+                                    <span class="info-value">${delay || ping || '未知'}ms</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">在线列表</span>
+                                    <div class="info-value players-sample">${playersDisplay}</div>
+                                </div>
+                            </div>
+                            <div class="players-info">
+                                <div class="player-count">玩家: <strong>${players.online}</strong> / ${players.max}</div>
+                                <div class="progress-bar">
+                                    <div class="progress-bar-inner" style="width: ${progressPercentage}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // 生成离线服务器HTML
+        function generateOfflineServerHTML(data, addressDisplay) {
+            const { server } = data;
+            const statusText = data.status === 'error' ? '错误' : '离线';
+            const statusValue = data.status === 'error' ? '查询失败' : '离线';
+            
+            return `
+                <div class="card status-card">
+                    <div class="online-content-wrapper">
+                        <div class="icon-container">
+                            <img src="${server.icon || DEFAULT_SERVER_ICON}" alt="Server Icon" class="server-icon">
+                        </div>
+                        <div class="main-content">
+                            <div class="card-header">
+                                <div class="motd-display">${server.name}</div>
+                                <div class="status-indicator Java" style="background-color: var(--offline-color);">
+                                    ${statusText}
+                                </div>
+                            </div>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <span class="info-label">地址</span>
+                                    <span class="info-value">${addressDisplay}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">状态</span>
+                                    <span class="info-value" style="color: var(--offline-color);">${statusValue}</span>
+                                </div>
+                            </div>
+                            ${data.error ? `<div class="error" style="margin-top: 10px;">${data.error}</div>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
         // 显示服务器状态
         function displayServerStatus(results) {
             let html = '';
@@ -386,47 +720,9 @@
                 const addressDisplay = getServerAddressDisplay(ip, port);
                 
                 if (data.status === 'online') {
-                    const { players, version } = data;
-                    
-                    // 查找MOTD
-                    let rawMotd = '';
-                    const motdFields = ['description', 'motd', 'rawMotd', 'pureMotd', 'htmlMotd'];
-                    for (const field of motdFields) {
-                        if (data.hasOwnProperty(field)) {
-                            rawMotd = data[field];
-                            break;
-                        }
-                    }
-                    
-                    const serverMOTD = convertMinecraftColors(rawMotd);
-                    
-                    html += `
-                        <article class="server-info">
-                            <h2>
-                                <span class="status-indicator status-online"></span>
-                                ${server.name}
-                            </h2>
-                            <p class="server-address"><strong>地址:</strong> ${addressDisplay}</p>
-                            <p><strong>状态:</strong> 在线</p>
-                            <p><strong>MOTD:</strong> ${serverMOTD || '无'}</p>
-                            <p><strong>版本:</strong> ${version || '未知'}</p>
-                            <div class="players">
-                                <p><strong>玩家:</strong> ${players.online}/${players.max} 在线</p>
-                            </div>
-                        </article>
-                    `;
+                    html += generateOnlineServerHTML(data, addressDisplay);
                 } else {
-                    html += `
-                        <article class="server-info">
-                            <h2>
-                                <span class="status-indicator status-offline"></span>
-                                ${server.name}
-                            </h2>
-                            <p class="server-address"><strong>地址:</strong> ${addressDisplay}</p>
-                            <p><strong>状态:</strong> ${data.status === 'error' ? '查询失败' : '离线'}</p>
-                            ${data.error ? `<p class="error"><strong>错误:</strong> ${data.error}</p>` : ''}
-                        </article>
-                    `;
+                    html += generateOfflineServerHTML(data, addressDisplay);
                 }
             });
             
@@ -434,15 +730,17 @@
         }
 
         // 初始化应用
+        // 1. 初始化主题切换功能
+        // 2. 显示加载状态
+        // 3. 首次查询所有服务器状态
+        // 4. 设置自动刷新定时器
         function initApp() {
             initThemeToggle();
             serverStatusSection.innerHTML = '<div class="loading">正在查询服务器状态...</div>';
             fetchAllServersStatus();
             
-            // 设置自动刷新
-            setInterval(() => {
-                fetchAllServersStatus();
-            }, config.autoRefreshInterval);
+            // 设置自动刷新定时器，每30秒更新一次服务器状态
+            setInterval(fetchAllServersStatus, CONFIG.AUTO_REFRESH_INTERVAL);
         }
 
         // 页面加载完成后初始化
