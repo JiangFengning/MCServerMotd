@@ -5,31 +5,82 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minecraft服务器状态查询</title>
     <style>
+        /* CSS变量定义 */
+        :root {
+            --bg-color: #f5f5f5;
+            --text-color: #333;
+            --container-bg: white;
+            --container-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            --status-bg: #f9f9f9;
+            --border-color: #eee;
+            --address-color: #666;
+            --players-bg: #e8f5e9;
+            --online-color: #4CAF50;
+            --offline-color: #f44336;
+            --error-color: #f44336;
+            --loading-color: #2196F3;
+            --toggle-bg: rgba(255, 255, 255, 0.8);
+            --toggle-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* 深色模式变量 */
+        body.dark-mode {
+            --bg-color: #242424;
+            --text-color: #e0e0e0;
+            --container-bg: #333333;
+            --container-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            --status-bg: #404040;
+            --border-color: #555555;
+            --address-color: #b0b0b0;
+            --players-bg: #2a4339;
+            --error-color: #ef5350;
+            --loading-color: #64b5f6;
+            --toggle-bg: rgba(60, 60, 60, 0.8);
+            --toggle-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
+            --toggle-text-color: #ffffff;
+        }
+        
+        /* 基础样式 */
+        * {
+            box-sizing: border-box;
+        }
+        
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 20px;
-            background-color: #f5f5f5;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             text-align: center;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
-        h1 {
-            color: #333;
+        
+        h1, h2 {
             margin-bottom: 20px;
         }
+        
+        h1 {
+            color: var(--text-color);
+        }
+        
         .container {
             max-width: 800px;
             margin: 0 auto;
-            background-color: white;
+            background-color: var(--container-bg);
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: var(--container-shadow);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
         }
+        
         #server-status {
             margin: 20px 0;
             padding: 20px;
             border-radius: 8px;
-            background-color: #f9f9f9;
+            background-color: var(--status-bg);
+            transition: background-color 0.3s ease;
         }
+        
         .status-indicator {
             display: inline-block;
             width: 12px;
@@ -37,17 +88,21 @@
             border-radius: 50%;
             margin-right: 8px;
         }
+        
         .status-online {
-            background-color: #4CAF50;
+            background-color: var(--online-color);
         }
+        
         .status-offline {
-            background-color: #f44336;
+            background-color: var(--offline-color);
         }
+        
         .server-info {
             margin: 10px 0;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--border-color);
             padding-bottom: 15px;
             margin-bottom: 15px;
+            transition: border-color 0.3s ease;
         }
         
         .server-info:last-child {
@@ -55,23 +110,30 @@
         }
         
         .server-address {
-            color: #666;
+            color: var(--address-color);
             font-style: italic;
             margin: 5px 0;
+            transition: color 0.3s ease;
         }
+        
         .players {
             margin-top: 15px;
             padding: 10px;
-            background-color: #e8f5e9;
+            background-color: var(--players-bg);
             border-radius: 4px;
+            transition: background-color 0.3s ease;
         }
+        
         .error {
-            color: #f44336;
+            color: var(--error-color);
             font-weight: bold;
+            transition: color 0.3s ease;
         }
+        
         .loading {
-            color: #2196F3;
+            color: var(--loading-color);
             font-style: italic;
+            transition: color 0.3s ease;
         }
         
         /* 主题切换按钮样式 */
@@ -83,10 +145,13 @@
             cursor: pointer;
             padding: 10px;
             border-radius: 50%;
-            background-color: rgba(255, 255, 255, 0.8);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            background-color: var(--toggle-bg);
+            color: var(--text-color);
+            box-shadow: var(--toggle-shadow);
             transition: all 0.3s ease;
             z-index: 1000;
+            border: none;
+            outline: none;
         }
         
         #theme-toggle:hover {
@@ -94,107 +159,120 @@
             box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
         }
         
-        /* 黑夜模式样式 */
-        body.dark-mode {
-            background-color: #242424;
-            color: #e0e0e0;
-        }
-        
-        body.dark-mode .container {
-            background-color: #333333;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-        }
-        
-        body.dark-mode h1, body.dark-mode h2 {
-            color: #ffffff;
-        }
-        
-        body.dark-mode #server-status {
-            background-color: #404040;
-        }
-        
-        body.dark-mode .server-info {
-            border-bottom-color: #555555;
-        }
-        
-        body.dark-mode .server-address {
-            color: #b0b0b0;
-        }
-        
-        body.dark-mode .players {
-            background-color: #2a4339;
-        }
-        
         body.dark-mode #theme-toggle {
-            background-color: rgba(60, 60, 60, 0.8);
-            color: #ffffff;
-            box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
+            color: var(--toggle-text-color);
         }
         
-        body.dark-mode .loading {
-            color: #64b5f6;
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            #theme-toggle {
+                top: 10px;
+                right: 10px;
+                font-size: 20px;
+                padding: 8px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            h2 {
+                font-size: 20px;
+            }
+            
+            .server-info {
+                padding-bottom: 10px;
+                margin-bottom: 10px;
+            }
         }
         
-        body.dark-mode .error {
-            color: #ef5350;
+        /* 加载动画 */
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+        
+        .loading {
+            animation: pulse 1.5s infinite;
         }
     </style>
 </head>
 <body>
-    <div id="theme-toggle">🌙</div>
-    <div class="container">
+    <button id="theme-toggle" aria-label="切换主题">🌙</button>
+    <main class="container">
         <h1>Minecraft服务器状态查询</h1>
-        <div id="server-status">
+        <section id="server-status">
             <div class="loading">正在查询服务器状态...</div>
-        </div>
-    </div>
+        </section>
+    </main>
 
     <script>
-        // 主题切换逻辑
+        // 配置和常量
+        const config = {
+            servers: [
+                { ip: 's6.ungc.com.cn', port: '15120', name: '童话镇' },
+                { ip: 'mc.fnzjaq.me', port: '25565', name: '你也来🐱🐟么' }
+            ],
+            apiBase: 'https://motd.minebbs.com/api/status',
+            cacheDuration: 60 * 1000, // 1分钟缓存
+            autoRefreshInterval: 30 * 1000, // 30秒自动刷新
+            maxRetries: 3 // 最大重试次数
+        };
+
+        // DOM元素
         const themeToggle = document.getElementById('theme-toggle');
-        
-        // 切换主题
-        function toggleTheme() {
-            const isDarkMode = document.body.classList.toggle('dark-mode');
-            // 更新按钮图标
-            themeToggle.textContent = isDarkMode ? '☀️' : '🌙';
-            // 保存用户偏好
-            localStorage.setItem('darkMode', isDarkMode);
+        const serverStatusSection = document.getElementById('server-status');
+
+        // 缓存管理
+        const cache = {
+            data: {},
+            
+            get(key) {
+                const item = this.data[key];
+                if (!item) return null;
+                if (Date.now() - item.timestamp > config.cacheDuration) {
+                    delete this.data[key];
+                    return null;
+                }
+                return item.value;
+            },
+            
+            set(key, value) {
+                this.data[key] = { value, timestamp: Date.now() };
+            }
+        };
+
+        // 主题切换功能
+        function initThemeToggle() {
+            // 页面加载时初始化主题
+            const isDarkMode = localStorage.getItem('darkMode') === 'true';
+            if (isDarkMode) {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+            }
+
+            // 添加点击事件监听器
+            themeToggle.addEventListener('click', () => {
+                const isDarkMode = document.body.classList.toggle('dark-mode');
+                themeToggle.textContent = isDarkMode ? '☀️' : '🌙';
+                localStorage.setItem('darkMode', isDarkMode);
+            });
         }
-        
-        // 添加点击事件监听器
-        themeToggle.addEventListener('click', toggleTheme);
-        
-        // Minecraft服务器列表配置
-        const servers = [
-            { ip: 's6.ungc.com.cn', port: '15120', name: '童话镇' },
-            { ip: 'mc.fnzjaq.me', port: '25565', name: '你也来🐱🐟么' }
-        ];
-
-        // 初始化状态显示
-        document.getElementById('server-status').innerHTML = '<div class="loading">正在查询服务器状态...</div>';
-
-        // 查询所有服务器状态
-        Promise.all(servers.map(server => {
-            const apiUrl = `https://motd.minebbs.com/api/status?ip=${server.ip}&port=${server.port}&stype=auto&string=${encodeURIComponent('服务器状态')}`;
-            return fetch(apiUrl)
-                .then(response => response.json())
-                .then(data => ({ ...data, server }))
-                .catch(error => {
-                    return { status: 'error', server, error: '无法连接到服务器' };
-                });
-        })).then(results => {
-            displayServerStatus(results);
-        }).catch(error => {
-            document.getElementById('server-status').innerHTML = 
-                '<div class="error">查询服务器状态失败，请稍后重试</div>';
-        });
 
         // 转换Minecraft颜色代码为HTML
         function convertMinecraftColors(motd) {
             if (!motd) return '';
             
-            // 处理嵌套的JSON结构（有些API返回的description是对象）
+            // 提取MOTD文本
             let motdText = '';
             if (typeof motd === 'object' && motd !== null) {
                 if (motd.text) {
@@ -211,102 +289,108 @@
                     motdText = JSON.stringify(motd);
                 }
             } else {
-                // 简单字符串
                 motdText = String(motd);
             }
             
-            // Minecraft颜色代码映射
+            // 颜色代码映射
             const colorMap = {
-                '0': '#000000', // 黑色
-                '1': '#0000AA', // 深蓝色
-                '2': '#00AA00', // 深绿色
-                '3': '#00AAAA', // 深青色
-                '4': '#AA0000', // 深红色
-                '5': '#AA00AA', // 紫色
-                '6': '#FFAA00', // 金色
-                '7': '#AAAAAA', // 灰色
-                '8': '#555555', // 深灰色
-                '9': '#5555FF', // 蓝色
-                'a': '#55FF55', // 绿色
-                'b': '#55FFFF', // 青色
-                'c': '#FF5555', // 红色
-                'd': '#FF55FF', // 粉色
-                'e': '#FFFF55', // 黄色
-                'f': '#FFFFFF'  // 白色
+                '0': '#000000', '1': '#0000AA', '2': '#00AA00', '3': '#00AAAA',
+                '4': '#AA0000', '5': '#AA00AA', '6': '#FFAA00', '7': '#AAAAAA',
+                '8': '#555555', '9': '#5555FF', 'a': '#55FF55', 'b': '#55FFFF',
+                'c': '#FF5555', 'd': '#FF55FF', 'e': '#FFFF55', 'f': '#FFFFFF'
             };
             
             // 格式代码映射
             const formatMap = {
-                'l': 'font-weight: bold;',    // 粗体
-                'm': 'text-decoration: line-through;', // 删除线
-                'n': 'text-decoration: underline;', // 下划线
-                'o': 'font-style: italic;'    // 斜体
+                'l': 'font-weight: bold;',
+                'm': 'text-decoration: line-through;',
+                'n': 'text-decoration: underline;',
+                'o': 'font-style: italic;'
             };
             
-            let result = '';
-            let currentColor = '';
-            let currentFormat = '';
+            // 浅色文本列表（在白色背景上需要深色阴影）
+            const lightColors = ['7', 'e', 'f'];
             
-            for (let i = 0; i < motdText.length; i++) {
-                if (motdText[i] === '§' && i + 1 < motdText.length) {
-                    const code = motdText[i + 1];
-                    
-                    if (code === 'r') {
-                        // 重置所有格式
-                        if (currentColor || currentFormat) {
-                            result += '</span>';
-                            currentColor = '';
-                            currentFormat = '';
-                        }
-                    } else if (colorMap[code]) {
-                        // 颜色代码
-                        if (currentColor || currentFormat) {
-                            result += '</span>';
-                        }
-                        currentColor = colorMap[code];
-                        currentFormat = '';
-                        result += `<span style="color: ${currentColor};${currentFormat}">`;
-                    } else if (formatMap[code]) {
-                        // 格式代码
-                        if (currentColor || currentFormat) {
-                            result += '</span>';
-                        }
-                        currentFormat += formatMap[code];
-                        result += `<span style="color: ${currentColor || '#FFFFFF'};${currentFormat}">`;
+            // 使用正则表达式优化颜色代码处理
+            return motdText.replace(/§([0-9a-frlmno])/g, (match, code) => {
+                if (code === 'r') return '</span>';
+                if (colorMap[code]) {
+                    // 为浅色文本添加深色阴影以提高可读性
+                    if (lightColors.includes(code)) {
+                        return `<span style="color: ${colorMap[code]}; text-shadow: 0 0 2px #000000, 0 0 2px #000000;">`;
                     }
-                    
-                    i++; // 跳过下一个字符
-                } else {
-                    result += motdText[i];
+                    return `<span style="color: ${colorMap[code]};">`;
                 }
-            }
-            
-            // 关闭最后一个span标签
-            if (currentColor || currentFormat) {
-                result += '</span>';
-            }
-            
-            return result;
+                if (formatMap[code]) return `<span style="${formatMap[code]}">`;
+                return match;
+            });
         }
-        
+
+        // 获取服务器地址显示文本
+        function getServerAddressDisplay(ip, port) {
+            return port === '25565' ? ip : `${ip}:${port}`;
+        }
+
+        // 查询单个服务器状态（带重试机制）
+        async function fetchServerStatus(server, retryCount = 0) {
+            const cacheKey = `${server.ip}:${server.port}`;
+            const cached = cache.get(cacheKey);
+            
+            if (cached) {
+                return { ...cached, server };
+            }
+
+            try {
+                const params = new URLSearchParams({
+                    ip: server.ip,
+                    port: server.port,
+                    stype: 'auto',
+                    string: encodeURIComponent('服务器状态')
+                });
+                
+                const response = await fetch(`${config.apiBase}?${params}`);
+                if (!response.ok) {
+                    throw new Error('网络响应错误');
+                }
+                
+                const data = await response.json();
+                cache.set(cacheKey, data);
+                return { ...data, server };
+            } catch (error) {
+                if (retryCount < config.maxRetries) {
+                    // 重试请求
+                    await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
+                    return fetchServerStatus(server, retryCount + 1);
+                }
+                return { status: 'error', server, error: '无法连接到服务器' };
+            }
+        }
+
+        // 查询所有服务器状态
+        async function fetchAllServersStatus() {
+            try {
+                const results = await Promise.all(config.servers.map(fetchServerStatus));
+                displayServerStatus(results);
+            } catch (error) {
+                serverStatusSection.innerHTML = '<div class="error">查询服务器状态失败，请稍后重试</div>';
+            }
+        }
+
         // 显示服务器状态
         function displayServerStatus(results) {
-            const statusDiv = document.getElementById('server-status');
             let html = '';
             
             results.forEach(data => {
                 const { server } = data;
                 const { ip, port } = server;
+                const addressDisplay = getServerAddressDisplay(ip, port);
                 
                 if (data.status === 'online') {
-                    const playersOnline = data.players.online;
-                    const playersMax = data.players.max;
+                    const { players, version } = data;
                     
-                    // 查找可能包含颜色的MOTD字段
+                    // 查找MOTD
                     let rawMotd = '';
-                    // 尝试各种常见的MOTD字段名
                     const motdFields = ['description', 'motd', 'rawMotd', 'pureMotd', 'htmlMotd'];
-                    
                     for (const field of motdFields) {
                         if (data.hasOwnProperty(field)) {
                             rawMotd = data[field];
@@ -315,50 +399,54 @@
                     }
                     
                     const serverMOTD = convertMinecraftColors(rawMotd);
-                    const serverVersion = data.version;
                     
                     html += `
-                        <div class="server-info">
+                        <article class="server-info">
                             <h2>
                                 <span class="status-indicator status-online"></span>
-                                ${data.server.name}
+                                ${server.name}
                             </h2>
-                            <p class="server-address"><strong>地址:</strong> ${ip === 'mc.fnzjaq.me' ? ip : `${ip}:${port}`}</p>
+                            <p class="server-address"><strong>地址:</strong> ${addressDisplay}</p>
                             <p><strong>状态:</strong> 在线</p>
                             <p><strong>MOTD:</strong> ${serverMOTD || '无'}</p>
-                            <p><strong>版本:</strong> ${serverVersion || '未知'}</p>
+                            <p><strong>版本:</strong> ${version || '未知'}</p>
                             <div class="players">
-                                <p><strong>玩家:</strong> ${playersOnline}/${playersMax} 在线</p>
+                                <p><strong>玩家:</strong> ${players.online}/${players.max} 在线</p>
                             </div>
-                        </div>
+                        </article>
                     `;
                 } else {
                     html += `
-                        <div class="server-info">
+                        <article class="server-info">
                             <h2>
                                 <span class="status-indicator status-offline"></span>
-                                ${data.server.name}
+                                ${server.name}
                             </h2>
-                            <p class="server-address"><strong>地址:</strong> ${ip === 'mc.fnzjaq.me' ? ip : `${ip}:${port}`}</p>
+                            <p class="server-address"><strong>地址:</strong> ${addressDisplay}</p>
                             <p><strong>状态:</strong> ${data.status === 'error' ? '查询失败' : '离线'}</p>
                             ${data.error ? `<p class="error"><strong>错误:</strong> ${data.error}</p>` : ''}
-                        </div>
+                        </article>
                     `;
                 }
             });
             
-            statusDiv.innerHTML = html;
+            serverStatusSection.innerHTML = html;
         }
-        
-        // 页面加载时初始化主题
-        document.addEventListener('DOMContentLoaded', () => {
-            // 检查本地存储中的用户偏好
-            const isDarkMode = localStorage.getItem('darkMode') === 'true';
-            if (isDarkMode) {
-                document.body.classList.add('dark-mode');
-                themeToggle.textContent = '☀️';
-            }
-        });
+
+        // 初始化应用
+        function initApp() {
+            initThemeToggle();
+            serverStatusSection.innerHTML = '<div class="loading">正在查询服务器状态...</div>';
+            fetchAllServersStatus();
+            
+            // 设置自动刷新
+            setInterval(() => {
+                fetchAllServersStatus();
+            }, config.autoRefreshInterval);
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
