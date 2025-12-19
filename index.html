@@ -45,6 +45,19 @@
         }
         .server-info {
             margin: 10px 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .server-info:last-child {
+            border-bottom: none;
+        }
+        
+        .server-address {
+            color: #666;
+            font-style: italic;
+            margin: 5px 0;
         }
         .players {
             margin-top: 15px;
@@ -60,9 +73,75 @@
             color: #2196F3;
             font-style: italic;
         }
+        
+        /* 主题切换按钮样式 */
+        #theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        #theme-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* 黑夜模式样式 */
+        body.dark-mode {
+            background-color: #242424;
+            color: #e0e0e0;
+        }
+        
+        body.dark-mode .container {
+            background-color: #333333;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        body.dark-mode h1, body.dark-mode h2 {
+            color: #ffffff;
+        }
+        
+        body.dark-mode #server-status {
+            background-color: #404040;
+        }
+        
+        body.dark-mode .server-info {
+            border-bottom-color: #555555;
+        }
+        
+        body.dark-mode .server-address {
+            color: #b0b0b0;
+        }
+        
+        body.dark-mode .players {
+            background-color: #2a4339;
+        }
+        
+        body.dark-mode #theme-toggle {
+            background-color: rgba(60, 60, 60, 0.8);
+            color: #ffffff;
+            box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
+        }
+        
+        body.dark-mode .loading {
+            color: #64b5f6;
+        }
+        
+        body.dark-mode .error {
+            color: #ef5350;
+        }
     </style>
 </head>
 <body>
+    <div id="theme-toggle">🌙</div>
     <div class="container">
         <h1>Minecraft服务器状态查询</h1>
         <div id="server-status">
@@ -71,57 +150,104 @@
     </div>
 
     <script>
-        // Minecraft服务器状态API查询
-        const serverIp = 's11.minekuai.com';
-        const serverPort = '10025';
-        const apiUrl = `https://motd.minebbs.com/api/status?ip=${serverIp}&port=${serverPort}&stype=auto`;
+        // 主题切换逻辑
+        const themeToggle = document.getElementById('theme-toggle');
+        
+        // 切换主题
+        function toggleTheme() {
+            const isDarkMode = document.body.classList.toggle('dark-mode');
+            // 更新按钮图标
+            themeToggle.textContent = isDarkMode ? '☀️' : '🌙';
+            // 保存用户偏好
+            localStorage.setItem('darkMode', isDarkMode);
+        }
+        
+        // 添加点击事件监听器
+        themeToggle.addEventListener('click', toggleTheme);
+        
+        // Minecraft服务器列表配置
+        const servers = [
+            { ip: 's11.minekuai.com', port: '10025', name: '童话镇' },
+            { ip: 'mc.fnzjaq.me', port: '25565', name: '你也来🐱🐟么' } // 默认Minecraft端口是25565
+        ];
 
-        // 查询服务器状态
-        fetch(apiUrl)
-            .then(response => response.json())
-            .then(data => displayServerStatus(data))
-            .catch(error => {
-                console.error('Error fetching server status:', error);
-                document.getElementById('server-status').innerHTML = 
-                    '<div class="error">查询服务器状态失败，请稍后重试</div>';
-            });
+        // 初始化状态显示
+        document.getElementById('server-status').innerHTML = '<div class="loading">正在查询服务器状态...</div>';
+
+        // 查询所有服务器状态
+        Promise.all(servers.map(server => {
+            const apiUrl = `https://motd.minebbs.com/api/status?ip=${server.ip}&port=${server.port}&stype=auto`;
+            return fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => ({ ...data, server }))
+                .catch(error => {
+                    console.error(`Error fetching status for ${server.ip}:${server.port}:`, error);
+                    return { status: 'error', server };
+                });
+        })).then(results => {
+            displayServerStatus(results);
+        }).catch(error => {
+            console.error('Error fetching server statuses:', error);
+            document.getElementById('server-status').innerHTML = 
+                '<div class="error">查询服务器状态失败，请稍后重试</div>';
+        });
 
         // 显示服务器状态
-        function displayServerStatus(data) {
+        function displayServerStatus(results) {
             const statusDiv = document.getElementById('server-status');
+            let html = '';
             
-            if (data.status === 'online') {
-                const playersOnline = data.players.online;
-                const playersMax = data.players.max;
-                const serverMOTD = data.pureMotd;
-                const serverVersion = data.version;
+            results.forEach(data => {
+                const { server } = data;
+                const { ip, port } = server;
                 
-                statusDiv.innerHTML = `
-                    <div class="server-info">
-                        <h2>
-                            <span class="status-indicator status-online"></span>
-                            ${serverIp}:${serverPort}
-                        </h2>
-                        <p><strong>状态:</strong> 在线</p>
-                        <p><strong>MOTD:</strong> ${serverMOTD}</p>
-                        <p><strong>版本:</strong> ${serverVersion}</p>
-                        <div class="players">
-                            <p><strong>玩家:</strong> ${playersOnline}/${playersMax} 在线</p>
+                if (data.status === 'online') {
+                    const playersOnline = data.players.online;
+                    const playersMax = data.players.max;
+                    const serverMOTD = data.pureMotd;
+                    const serverVersion = data.version;
+                    
+                    html += `
+                        <div class="server-info">
+                            <h2>
+                                <span class="status-indicator status-online"></span>
+                                ${data.server.name}
+                            </h2>
+                            <p class="server-address"><strong>地址:</strong> ${ip === 'mc.fnzjaq.me' ? ip : `${ip}:${port}`}</p>
+                            <p><strong>状态:</strong> 在线</p>
+                            <p><strong>MOTD:</strong> ${serverMOTD}</p>
+                            <p><strong>版本:</strong> ${serverVersion}</p>
+                            <div class="players">
+                                <p><strong>玩家:</strong> ${playersOnline}/${playersMax} 在线</p>
+                            </div>
                         </div>
-                    </div>
-                `;
-            } else {
-                statusDiv.innerHTML = `
-                    <div class="server-info">
-                        <h2>
-                            <span class="status-indicator status-offline"></span>
-                            ${serverIp}:${serverPort}
-                        </h2>
-                        <p><strong>状态:</strong> 离线</p>
-                    </div>
-                `;
-            }
+                    `;
+                } else {
+                    html += `
+                        <div class="server-info">
+                            <h2>
+                                <span class="status-indicator status-offline"></span>
+                                ${data.server.name}
+                            </h2>
+                            <p class="server-address"><strong>地址:</strong> ${ip === 'mc.fnzjaq.me' ? ip : `${ip}:${port}`}</p>
+                            <p><strong>状态:</strong> ${data.status === 'error' ? '查询失败' : '离线'}</p>
+                        </div>
+                    `;
+                }
+            });
+            
+            statusDiv.innerHTML = html;
         }
+        
+        // 页面加载时初始化主题
+        document.addEventListener('DOMContentLoaded', () => {
+            // 检查本地存储中的用户偏好
+            const isDarkMode = localStorage.getItem('darkMode') === 'true';
+            if (isDarkMode) {
+                document.body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️';
+            }
+        });
     </script>
 </body>
 </html>
