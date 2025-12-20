@@ -1,3 +1,5 @@
+// ctrl+f 服务器列表配置
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -102,6 +104,26 @@
             transition: color 0.3s ease;
         }
         
+        /* GitHub链接样式 */
+        #github-link {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 50%;
+            background-color: var(--toggle-bg);
+            color: var(--text-color);
+            box-shadow: var(--toggle-shadow);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+
         /* 主题切换按钮样式 */
         #theme-toggle {
             position: fixed;
@@ -120,6 +142,11 @@
             outline: none;
         }
         
+        #github-link:hover {
+            transform: scale(1.1);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+        }
+
         #theme-toggle:hover {
             transform: scale(1.1);
             box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
@@ -137,6 +164,13 @@
             
             .container {
                 padding: 15px;
+            }
+            
+            #github-link {
+                top: 10px;
+                left: 10px;
+                font-size: 20px;
+                padding: 8px;
             }
             
             #theme-toggle {
@@ -375,6 +409,11 @@
     </style>
 </head>
 <body>
+    <a id="github-link" href="https://github.com/JiangFengning/MCServerMotd" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+        </svg>
+    </a>
     <button id="theme-toggle" aria-label="切换主题">🌙</button>
     <main class="container">
         <h1>Minecraft服务器状态查询</h1>
@@ -390,8 +429,8 @@
             SERVERS: [
                 { ip: 's6.ungc.com.cn', port: '15120', name: '童话镇' },
                 { ip: 'mc.fnzjaq.me', port: '25565', name: '你也来🐱🐟么' },
+                { ip: 'mc.fnzjaq.me', port: '31659', name: '猫娘乐园' },
                 { ip: 'okkmc.cn', port: '32230', name: 'OKKMC' },
-                { ip: 'mc.fnzjaq.me', port: '31659', name: '猫娘乐园' }
             ],
             // API基础URL
             API_BASE: 'https://motd.minebbs.com/api/status',
